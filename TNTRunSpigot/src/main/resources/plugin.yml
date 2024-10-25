@@ -1,0 +1,4 @@
+name: TNTRunSpigot
+version: '1.0-SNAPSHOT'
+main: org.gabo6480.tNTRunSpigot.TNTRunSpigot
+api-version: '1.20'
