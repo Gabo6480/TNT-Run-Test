@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "tntrunfabricclient",
+  "version": "${version}",
+  "name": "TNTRun FabricClient",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/tntrunfabricclient/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "org.gabo6480.tntrunfabricclient.client.TntrunfabricclientClient"
+    ],
+    "main": [
+      "org.gabo6480.tntrunfabricclient.Tntrunfabricclient"
+    ]
+  },
+  "mixins": [
+    "tntrunfabricclient.mixins.json",
+    {
+      "config": "tntrunfabricclient.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
