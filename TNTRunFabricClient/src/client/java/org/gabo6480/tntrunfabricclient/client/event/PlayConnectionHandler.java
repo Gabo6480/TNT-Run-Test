@@ -9,7 +9,7 @@ import org.gabo6480.tntrunfabricclient.client.packethandlers.ActionbarPacketHand
 
 public class PlayConnectionHandler implements ClientPlayConnectionEvents.Init,  ClientPlayConnectionEvents.Disconnect{
 
-    final Identifier actionbar = new Identifier("gabo6480.tntrun", "actionbar");
+    static final Identifier actionbar = new Identifier("gabo6480", "actionbar".toLowerCase());
 
     @Override
     public void onPlayInit(ClientPlayNetworkHandler handler, MinecraftClient client) {

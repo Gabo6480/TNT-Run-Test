@@ -10,6 +10,8 @@ public class TntrunfabricclientClient implements ClientModInitializer {
     public void onInitializeClient() {
         PlayConnectionHandler handler = new PlayConnectionHandler();
 
+
+
         ClientPlayConnectionEvents.INIT.register(handler);
         ClientPlayConnectionEvents.DISCONNECT.register(handler);
     }

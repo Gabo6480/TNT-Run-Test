@@ -1,1 +1,3 @@
 rootProject.name = 'TNTRunSpigot'
+include("Common")
+findProject(":Common")?.projectDir = new File("..\\Common")
