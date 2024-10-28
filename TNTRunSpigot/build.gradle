@@ -20,6 +20,9 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
     implementation project(":Common")
+    implementation 'org.jetbrains:annotations:24.0.0'
+    compileOnly  'org.projectlombok:lombok:1.18.34'
+    annotationProcessor  'org.projectlombok:lombok:1.18.34'
 }
 
 def targetJavaVersion = 17
@@ -57,6 +60,8 @@ processResources {
 }
 
 jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+
     manifest {
         attributes "Main-Class": "TNTRunSpigot"
     }
