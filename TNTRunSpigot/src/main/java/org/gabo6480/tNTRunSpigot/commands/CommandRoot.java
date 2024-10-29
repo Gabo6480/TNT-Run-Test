@@ -6,6 +6,7 @@ import org.bukkit.command.TabExecutor;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandContext;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandTemplate;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandVisibility;
+import org.gabo6480.tNTRunSpigot.repositories.LobbyRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

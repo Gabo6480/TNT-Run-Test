@@ -52,6 +52,6 @@ public class FileArgumentProvider extends AbstractArgumentProvider<File>{
 
     @Override
     public String GetObjectName(File object) {
-        return worldContainer.toURI().relativize(object.toURI()).getPath();
+        return worldContainer.toURI().relativize(object.toURI()).getPath().replace("/", "");
     }
 }
