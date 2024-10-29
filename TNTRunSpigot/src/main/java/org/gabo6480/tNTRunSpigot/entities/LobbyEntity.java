@@ -2,6 +2,9 @@ package org.gabo6480.tNTRunSpigot.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
+import org.gabo6480.tNTRunSpigot.repositories.LobbyRepository;
 
 import java.util.UUID;
 
@@ -23,7 +26,36 @@ public class LobbyEntity {
     @Column(nullable = true)
     private java.util.UUID UUID;
 
+    public boolean LoadLobby(LobbyRepository repo){
+        System.out.println("Loading lobby " + name);
 
-    //TODO: Agregar logica para cargar y descargar el mapa
-    //TODO: Incluir en la logica de cargar el mapa que: Configurable de gamerules (pero que no se genere terreno de mientras mamón)
+        var world = new WorldCreator(worldPath).createWorld();
+
+        if (world != null) {
+            world.setAutoSave(false);
+
+            this.UUID = world.getUID();
+            System.out.println("Lobby " + name + " loaded with UUID: " + UUID);
+            return true;
+        }
+        else{
+            System.out.println("World folder missing for lobby: " + name);
+            this.UUID = null;
+        }
+
+        repo.update(this);
+
+        return false;
+    }
+
+    public boolean UnloadLobby(){
+        var world = Bukkit.getWorld(UUID);
+
+        if(world == null) return true;
+
+        //world.getPlayers()
+
+        System.out.println("Unloading world " + world.getName());
+        return Bukkit.unloadWorld(world, false);
+    }
 }

@@ -37,7 +37,7 @@ public abstract class AbstractArgumentProvider<T> implements OptionalArgumentPro
     public abstract String GetObjectName(T object);
 
     @Override
-    public @Nullable String GetDefaultValue() {
+    public @Nullable String GetDefaultValue(CommandContext context) {
         return defaultValue;
     }
 }

@@ -9,12 +9,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 public class CommandContext {
-    public class CommandArgumentHolder {
-        public class CommandArgument {
-
+    public static class CommandArgumentHolder {
+        public static class CommandArgument {
+            final static List<String> booleanStrings = List.of("true", "yes", "1", "t", "y", "verdadero", "si");
             @NotNull
             String value;
 
@@ -33,6 +34,13 @@ public class CommandContext {
 
             public Double toDouble(){
                 return Double.parseDouble(value);
+            }
+
+            public Boolean toBoolean(){
+
+                var v = value.toLowerCase();
+
+                return booleanStrings.stream().anyMatch(s -> Objects.equals(s, v));
             }
         }
 

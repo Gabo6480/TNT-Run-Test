@@ -57,26 +57,9 @@ public final class TNTRunSpigot extends JavaPlugin {
         var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
         LobbyRepository repo = new LobbyRepository_(session);
 
-        List<LobbyEntity> lobbies = new ArrayList<>();
-
         repo.findAll().forEach(lobbyEntity -> {
-            System.out.println("Loading lobby " + lobbyEntity.getName());
-
-            var world = new WorldCreator(lobbyEntity.getWorldPath()).createWorld();
-
-            if (world != null) {
-                world.setAutoSave(false);
-
-                lobbyEntity.setUUID(world.getUID());
-            }
-            else{
-                System.out.println("World folder missing for lobby: " + lobbyEntity.getName());
-                lobbyEntity.setUUID(null);
-            }
-            lobbies.add(lobbyEntity);
+            lobbyEntity.LoadLobby(repo);
         });
-
-        repo.updateAll(lobbies);
 
         session.close();
     }
@@ -88,15 +71,7 @@ public final class TNTRunSpigot extends JavaPlugin {
 
         LobbyRepository repo = new LobbyRepository_(session);
 
-        var lobbies = repo.findAll();
-
-        lobbies.forEach(lobbyEntity -> {
-            var world = Bukkit.getWorld(lobbyEntity.getUUID());
-
-            if(world == null) return;
-            System.out.println("Unloading world " + world.getName());
-            Bukkit.unloadWorld(world, false);
-        });
+        repo.findAll().forEach(LobbyEntity::UnloadLobby);
 
         session.close();
 

@@ -118,7 +118,7 @@ public abstract class CommandTemplate {
                 int optionalArgumentIndex = currentArgIndex - requiredArgs.size();
                 if(Objects.requireNonNull(context.arguments.get(currentArgIndex)).toString().isEmpty()){
                     String optionalArgName = optionalArgs.get(optionalArgumentIndex).GetName();
-                    String optionalArgDefault = optionalArgs.get(optionalArgumentIndex).GetDefaultValue();
+                    String optionalArgDefault = optionalArgs.get(optionalArgumentIndex).GetDefaultValue(context);
 
                     if(optionalArgDefault != null)
                         optionalArgName += "=" + optionalArgDefault;

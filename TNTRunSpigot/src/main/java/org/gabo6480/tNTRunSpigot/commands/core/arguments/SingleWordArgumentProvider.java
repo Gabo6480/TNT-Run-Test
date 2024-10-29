@@ -48,7 +48,7 @@ public class SingleWordArgumentProvider implements OptionalArgumentProvider {
     }
 
     @Override
-    public String GetDefaultValue() {
+    public String GetDefaultValue(CommandContext context) {
         return defaultValue;
     }
 }

@@ -28,6 +28,7 @@ public class CommandRoot extends CommandTemplate implements TabExecutor {
         this.visibility = CommandVisibility.VISIBLE;
 
         this.subCommands.add(new LobbyCommand());
+        this.subCommands.add(new WorldCommand());
     }
 
     @Override
