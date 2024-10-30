@@ -2,19 +2,14 @@ package org.gabo6480.tNTRunSpigot;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.gabo6480.tNTRunSpigot.commands.CommandRoot;
-import org.gabo6480.tNTRunSpigot.entities.LobbyEntity;
+import org.gabo6480.tNTRunSpigot.entities.ArenaEntity;
 import org.gabo6480.tNTRunSpigot.listeners.PlayerMessageListener;
-import org.gabo6480.tNTRunSpigot.repositories.LobbyRepository;
-import org.gabo6480.tNTRunSpigot.repositories.LobbyRepository_;
+import org.gabo6480.tNTRunSpigot.repositories.ArenaRepository;
+import org.gabo6480.tNTRunSpigot.repositories.ArenaRepository_;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public final class TNTRunSpigot extends JavaPlugin {
 
@@ -41,7 +36,7 @@ public final class TNTRunSpigot extends JavaPlugin {
 
         sessionFactory = new Configuration()
                 .setProperty("hibernate.connection.url", "jdbc:sqlite:"+ this.getDataFolder().getAbsolutePath() + "/plugin.db")
-                .addAnnotatedClass(LobbyEntity.class)
+                .addAnnotatedClass(ArenaEntity.class)
                 //.configure()
                 .buildSessionFactory();
 
@@ -55,10 +50,10 @@ public final class TNTRunSpigot extends JavaPlugin {
         mainCommand.setTabCompleter(tabExecutor);
 
         var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
-        LobbyRepository repo = new LobbyRepository_(session);
+        ArenaRepository repo = new ArenaRepository_(session);
 
-        repo.findAll().forEach(lobbyEntity -> {
-            lobbyEntity.LoadLobby(repo);
+        repo.findAll().forEach(arenaEntity -> {
+            arenaEntity.LoadArena(repo);
         });
 
         session.close();
@@ -69,9 +64,9 @@ public final class TNTRunSpigot extends JavaPlugin {
 
         var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
 
-        LobbyRepository repo = new LobbyRepository_(session);
+        ArenaRepository repo = new ArenaRepository_(session);
 
-        repo.findAll().forEach(LobbyEntity::UnloadLobby);
+        repo.findAll().forEach(ArenaEntity::UnloadArena);
 
         session.close();
 

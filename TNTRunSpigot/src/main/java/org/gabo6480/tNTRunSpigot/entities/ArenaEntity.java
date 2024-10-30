@@ -4,14 +4,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
-import org.gabo6480.tNTRunSpigot.repositories.LobbyRepository;
-
-import java.util.UUID;
+import org.gabo6480.tNTRunSpigot.repositories.ArenaRepository;
 
 @Data
 @Entity
-@Table(name = "lobby")
-public class LobbyEntity {
+@Table(name = "arena")
+public class ArenaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
@@ -26,7 +24,7 @@ public class LobbyEntity {
     @Column(nullable = true)
     private java.util.UUID UUID;
 
-    public boolean LoadLobby(LobbyRepository repo){
+    public boolean LoadArena(ArenaRepository repo){
         System.out.println("Loading lobby " + name);
 
         var world = new WorldCreator(worldPath).createWorld();
@@ -35,11 +33,11 @@ public class LobbyEntity {
             world.setAutoSave(false);
 
             this.UUID = world.getUID();
-            System.out.println("Lobby " + name + " loaded with UUID: " + UUID);
+            System.out.println("Arena " + name + " loaded with UUID: " + UUID);
             return true;
         }
         else{
-            System.out.println("World folder missing for lobby: " + name);
+            System.out.println("World folder missing for arena: " + name);
             this.UUID = null;
         }
 
@@ -48,7 +46,7 @@ public class LobbyEntity {
         return false;
     }
 
-    public boolean UnloadLobby(){
+    public boolean UnloadArena(){
         var world = Bukkit.getWorld(UUID);
 
         if(world == null) return true;

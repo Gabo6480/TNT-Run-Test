@@ -1,16 +1,11 @@
 package org.gabo6480.tNTRunSpigot.commands;
 
 import org.bukkit.Bukkit;
-import org.gabo6480.tNTRunSpigot.TNTRunSpigot;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandContext;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandRequirements;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandTemplate;
-import org.gabo6480.tNTRunSpigot.commands.core.arguments.BooleanArgumentProvider;
 import org.gabo6480.tNTRunSpigot.commands.core.arguments.GameRuleArgumentProvider;
-import org.gabo6480.tNTRunSpigot.commands.core.arguments.LobbyArgumentProvider;
 import org.gabo6480.tNTRunSpigot.commands.core.arguments.WorldArgumentProvider;
-import org.gabo6480.tNTRunSpigot.repositories.LobbyRepository;
-import org.gabo6480.tNTRunSpigot.repositories.LobbyRepository_;
 
 public class WorldCommand extends CommandTemplate {
     public static class WorldTeleportSubCommand extends CommandTemplate{

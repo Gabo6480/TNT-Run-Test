@@ -8,17 +8,17 @@ import org.gabo6480.tNTRunSpigot.commands.core.CommandRequirements;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandTemplate;
 import org.gabo6480.tNTRunSpigot.commands.core.arguments.BooleanArgumentProvider;
 import org.gabo6480.tNTRunSpigot.commands.core.arguments.FileArgumentProvider;
-import org.gabo6480.tNTRunSpigot.commands.core.arguments.LobbyArgumentProvider;
+import org.gabo6480.tNTRunSpigot.commands.core.arguments.ArenaArgumentProvider;
 import org.gabo6480.tNTRunSpigot.commands.core.arguments.SingleWordArgumentProvider;
-import org.gabo6480.tNTRunSpigot.entities.LobbyEntity;
-import org.gabo6480.tNTRunSpigot.repositories.LobbyRepository;
-import org.gabo6480.tNTRunSpigot.repositories.LobbyRepository_;
+import org.gabo6480.tNTRunSpigot.entities.ArenaEntity;
+import org.gabo6480.tNTRunSpigot.repositories.ArenaRepository;
+import org.gabo6480.tNTRunSpigot.repositories.ArenaRepository_;
 
 
-public class LobbyCommand extends CommandTemplate {
+public class ArenaCommand extends CommandTemplate {
 
-    public static class LobbyCreateSubCommand extends CommandTemplate{
-        public LobbyCreateSubCommand() {
+    public static class ArenaCreateSubCommand extends CommandTemplate{
+        public ArenaCreateSubCommand() {
             this.aliases.add( "create" );
 
             this.requiredArgs.add(new SingleWordArgumentProvider("name"));
@@ -36,12 +36,12 @@ public class LobbyCommand extends CommandTemplate {
 
             var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
 
-            LobbyRepository repo = new LobbyRepository_(session);
+            ArenaRepository repo = new ArenaRepository_(session);
 
-            var lobby = repo.findByName(nameAsString);
+            var arena = repo.findByName(nameAsString);
 
-            if(lobby != null && !lobby.isEmpty()) {
-                context.getSender().sendMessage("§4The is already a Lobby named \"" + nameAsString + "\"");
+            if(arena != null && !arena.isEmpty()) {
+                context.getSender().sendMessage("§4The is already a arena named \"" + nameAsString + "\"");
                 return true;
             }
 
@@ -54,7 +54,7 @@ public class LobbyCommand extends CommandTemplate {
                 worldPathString = nameAsString;
             }
 
-            context.getSender().sendMessage("§2Creating Lobby \"" + nameAsString + "\"...");
+            context.getSender().sendMessage("§2Creating arena \"" + nameAsString + "\"...");
 
 
             var world = new WorldCreator(worldPathString).createWorld();
@@ -66,14 +66,14 @@ public class LobbyCommand extends CommandTemplate {
 
             System.out.println(nameAsString + " // " + worldPathString + " // " + world.getUID());
 
-            LobbyEntity newLobby = new LobbyEntity();
-            newLobby.setName(nameAsString);
-            newLobby.setWorldPath(worldPathString);
-            newLobby.setUUID(world.getUID());
+            ArenaEntity newArena = new ArenaEntity();
+            newArena.setName(nameAsString);
+            newArena.setWorldPath(worldPathString);
+            newArena.setUUID(world.getUID());
 
-            repo.insert(newLobby);
+            repo.insert(newArena);
 
-            context.getSender().sendMessage("§2Lobby \"" + nameAsString + "\" created successfully!");
+            context.getSender().sendMessage("§2Arena \"" + nameAsString + "\" created successfully!");
 
             session.close();
 
@@ -81,11 +81,11 @@ public class LobbyCommand extends CommandTemplate {
         }
     }
 
-    public static class LobbyTeleportSubCommand extends CommandTemplate{
-        public LobbyTeleportSubCommand() {
+    public static class ArenaTeleportSubCommand extends CommandTemplate{
+        public ArenaTeleportSubCommand() {
             this.aliases.add( "teleport" );
 
-            this.requiredArgs.add(new LobbyArgumentProvider());
+            this.requiredArgs.add(new ArenaArgumentProvider());
             this.optionalArgs.add(new BooleanArgumentProvider("force load", false));
 
             this.requirements = CommandRequirements.builder().playerOnly(true).build();
@@ -102,33 +102,33 @@ public class LobbyCommand extends CommandTemplate {
 
             var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
 
-            LobbyRepository repo = new LobbyRepository_(session);
+            ArenaRepository repo = new ArenaRepository_(session);
 
             var lobbies = repo.findByName(nameAsString);
 
             if(lobbies == null || lobbies.isEmpty()) {
-                context.getSender().sendMessage("§4There is no such Lobby as \"" + nameAsString + "\"");
+                context.getSender().sendMessage("§4There is no such arena as \"" + nameAsString + "\"");
                 return true;
             }
 
-            var lobby = lobbies.get(0);
+            var arena = lobbies.get(0);
 
 
-            var world = Bukkit.getWorld(lobby.getUUID());
+            var world = Bukkit.getWorld(arena.getUUID());
 
             if(world == null){
                 var forceLoad = context.getArguments().get(1);
 
                 if(forceLoad == null || !forceLoad.toBoolean()) {
 
-                    context.getSender().sendMessage("§4The lobby \"" + nameAsString + "\" is unloaded, try again later. Or set [force load] to true. ");
+                    context.getSender().sendMessage("§4The arena \"" + nameAsString + "\" is unloaded, try again later. Or set [force load] to true. ");
                     return true;
                 }
                 else if(forceLoad.toBoolean()){
-                    context.getSender().sendMessage("§1Loading \"" + nameAsString + "\" lobby before teleport..." );
-                    lobby.LoadLobby(repo);
-                    context.getSender().sendMessage("§2The lobby \"" + nameAsString + "\" is now loaded. ");
-                    world = Bukkit.getWorld(lobby.getUUID());
+                    context.getSender().sendMessage("§1Loading \"" + nameAsString + "\" arena before teleport..." );
+                    arena.LoadArena(repo);
+                    context.getSender().sendMessage("§2The arena \"" + nameAsString + "\" is now loaded. ");
+                    world = Bukkit.getWorld(arena.getUUID());
                 }
             }
 
@@ -143,11 +143,11 @@ public class LobbyCommand extends CommandTemplate {
         }
     }
 
-    public static class LobbyLoadSubCommand extends CommandTemplate{
-        public LobbyLoadSubCommand() {
+    public static class ArenaLoadSubCommand extends CommandTemplate{
+        public ArenaLoadSubCommand() {
             this.aliases.add( "load" );
 
-            this.requiredArgs.add(new LobbyArgumentProvider());
+            this.requiredArgs.add(new ArenaArgumentProvider());
         }
 
         @Override
@@ -161,7 +161,7 @@ public class LobbyCommand extends CommandTemplate {
 
             var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
 
-            LobbyRepository repo = new LobbyRepository_(session);
+            ArenaRepository repo = new ArenaRepository_(session);
 
             var lobbies = repo.findByName(nameAsString);
 
@@ -170,24 +170,24 @@ public class LobbyCommand extends CommandTemplate {
                 return true;
             }
 
-            var lobby = lobbies.get(0);
+            var arena = lobbies.get(0);
 
 
-            var world = Bukkit.getWorld(lobby.getUUID());
+            var world = Bukkit.getWorld(arena.getUUID());
 
             if(world != null){
 
-                context.getSender().sendMessage("§1The lobby \"" + nameAsString + "\" is already loaded. ");
+                context.getSender().sendMessage("§1The arena \"" + nameAsString + "\" is already loaded. ");
                 return true;
             }
 
-            var res = lobby.LoadLobby(repo);
+            var res = arena.LoadArena(repo);
 
             if(res) {
-                context.getSender().sendMessage("§2The lobby \"" + nameAsString + "\" is now loaded. ");
+                context.getSender().sendMessage("§2The arena \"" + nameAsString + "\" is now loaded. ");
             }
             else {
-                context.getSender().sendMessage("§4The lobby \"" + nameAsString + "\" could not be loaded. ");
+                context.getSender().sendMessage("§4The arena \"" + nameAsString + "\" could not be loaded. ");
             }
 
             session.close();
@@ -195,11 +195,11 @@ public class LobbyCommand extends CommandTemplate {
         }
     }
 
-    public static class LobbyUnloadSubCommand extends CommandTemplate{
-        public LobbyUnloadSubCommand() {
+    public static class ArenaUnloadSubCommand extends CommandTemplate{
+        public ArenaUnloadSubCommand() {
             this.aliases.add( "unload" );
 
-            this.requiredArgs.add(new LobbyArgumentProvider());
+            this.requiredArgs.add(new ArenaArgumentProvider());
         }
 
         @Override
@@ -213,7 +213,7 @@ public class LobbyCommand extends CommandTemplate {
 
             var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
 
-            LobbyRepository repo = new LobbyRepository_(session);
+            ArenaRepository repo = new ArenaRepository_(session);
 
             var lobbies = repo.findByName(nameAsString);
 
@@ -222,23 +222,23 @@ public class LobbyCommand extends CommandTemplate {
                 return true;
             }
 
-            var lobby = lobbies.get(0);
+            var arena = lobbies.get(0);
 
-            var world = Bukkit.getWorld(lobby.getUUID());
+            var world = Bukkit.getWorld(arena.getUUID());
 
             if(world == null){
 
-                context.getSender().sendMessage("§1The lobby \"" + nameAsString + "\" is already unloaded. ");
+                context.getSender().sendMessage("§1The arena \"" + nameAsString + "\" is already unloaded. ");
                 return true;
             }
 
-            var res = lobby.UnloadLobby();
+            var res = arena.UnloadArena();
 
             if(res) {
-                context.getSender().sendMessage("§3The lobby \"" + nameAsString + "\" is now unloaded. ");
+                context.getSender().sendMessage("§3The arena \"" + nameAsString + "\" is now unloaded. ");
             }
             else {
-                context.getSender().sendMessage("§4The lobby \"" + nameAsString + "\" could not be unloaded. ");
+                context.getSender().sendMessage("§4The arena \"" + nameAsString + "\" could not be unloaded. ");
             }
 
             session.close();
@@ -246,15 +246,15 @@ public class LobbyCommand extends CommandTemplate {
         }
     }
 
-    public LobbyCommand() {
+    public ArenaCommand() {
         super();
 
-        this.aliases.add( "lobby" );
+        this.aliases.add( "arena" );
 
-        this.subCommands.add(new LobbyCreateSubCommand());
-        this.subCommands.add(new LobbyTeleportSubCommand());
-        this.subCommands.add(new LobbyLoadSubCommand());
-        this.subCommands.add(new LobbyUnloadSubCommand());
+        this.subCommands.add(new ArenaCreateSubCommand());
+        this.subCommands.add(new ArenaTeleportSubCommand());
+        this.subCommands.add(new ArenaLoadSubCommand());
+        this.subCommands.add(new ArenaUnloadSubCommand());
     }
 
     @Override
