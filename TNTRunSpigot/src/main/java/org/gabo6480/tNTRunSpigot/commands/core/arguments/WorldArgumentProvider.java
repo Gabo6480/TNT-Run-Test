@@ -31,7 +31,7 @@ public class WorldArgumentProvider extends AbstractArgumentProvider<World>{
     }
 
     @Override
-    public Collection<? extends World> getObjectCollection(CommandContext context, int currentArgumentIndex) {
+    public Collection<? extends World> GetObjectCollection(CommandContext context, int currentArgumentIndex) {
         return Bukkit.getWorlds();
     }
 

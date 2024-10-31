@@ -28,12 +28,12 @@ public abstract class AbstractArgumentProvider<T> implements OptionalArgumentPro
 
     @Override
     public List<String> GetCompletions(CommandContext context, int currentArgumentIndex) {
-        return getObjectCollection(context, currentArgumentIndex).stream()
+        return GetObjectCollection(context, currentArgumentIndex).stream()
                 .filter(t -> filter.apply(t, context))
                 .map(this::GetObjectName).toList();
     }
 
-    public abstract Collection<? extends T> getObjectCollection(CommandContext context, int currentArgumentIndex);
+    public abstract Collection<? extends T> GetObjectCollection(CommandContext context, int currentArgumentIndex);
     public abstract String GetObjectName(T object);
 
     @Override

@@ -27,22 +27,16 @@ public class ArenaArgumentProvider extends AbstractArgumentProvider<ArenaEntity>
         this(name,defaultValue,(w, ctx) -> true);
     }
 
-    public ArenaArgumentProvider(BiFunction<ArenaEntity, CommandContext, Boolean> fileFilter){
-        this("arena",null, fileFilter);
+    public ArenaArgumentProvider(BiFunction<ArenaEntity, CommandContext, Boolean> arenaFilter){
+        this("arena",null, arenaFilter);
     }
 
     @Override
-    public Collection<? extends ArenaEntity> getObjectCollection(CommandContext context, int currentArgumentIndex) {
+    public Collection<? extends ArenaEntity> GetObjectCollection(CommandContext context, int currentArgumentIndex) {
 
-        var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
+        var manager = TNTRunSpigot.instance.getArenaManager();
 
-        ArenaRepository repo = new ArenaRepository_(session);
-
-        var arenas = repo.findAll().toList();
-
-        session.close();
-
-        return arenas;
+        return manager.getArenas().values();
     }
 
     @Override

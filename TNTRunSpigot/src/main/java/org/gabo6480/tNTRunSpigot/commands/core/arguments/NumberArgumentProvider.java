@@ -28,7 +28,7 @@ public class NumberArgumentProvider <N extends Number> extends AbstractArgumentP
     }
 
     @Override
-    public Collection<? extends N> getObjectCollection(CommandContext context, int currentArgumentIndex) {
+    public Collection<? extends N> GetObjectCollection(CommandContext context, int currentArgumentIndex) {
 
         List<N> completions = new ArrayList<>();
 

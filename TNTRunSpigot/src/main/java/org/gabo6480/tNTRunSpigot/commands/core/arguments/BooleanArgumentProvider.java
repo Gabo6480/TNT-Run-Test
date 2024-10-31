@@ -20,7 +20,7 @@ public class BooleanArgumentProvider extends AbstractArgumentProvider<Boolean> {
     }
 
     @Override
-    public Collection<Boolean> getObjectCollection(CommandContext context, int currentArgumentIndex) {
+    public Collection<Boolean> GetObjectCollection(CommandContext context, int currentArgumentIndex) {
         return List.of(true, false);
     }
 

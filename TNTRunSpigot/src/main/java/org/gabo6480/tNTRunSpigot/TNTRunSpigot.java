@@ -2,14 +2,16 @@ package org.gabo6480.tNTRunSpigot;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.gabo6480.tNTRunSpigot.commands.CommandRoot;
 import org.gabo6480.tNTRunSpigot.entities.ArenaEntity;
-import org.gabo6480.tNTRunSpigot.listeners.PlayerMessageListener;
-import org.gabo6480.tNTRunSpigot.repositories.ArenaRepository;
-import org.gabo6480.tNTRunSpigot.repositories.ArenaRepository_;
+import org.gabo6480.tNTRunSpigot.listeners.EventListenerTemplate;
+import org.gabo6480.tNTRunSpigot.managers.ArenaManager;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+
+import java.util.Objects;
 
 public final class TNTRunSpigot extends JavaPlugin {
 
@@ -17,7 +19,13 @@ public final class TNTRunSpigot extends JavaPlugin {
     final static public String actionbarChannel = "gabo6480:actionbar";
 
     @Getter
+    public Location lobby;
+
+    @Getter
     private SessionFactory sessionFactory;
+
+    @Getter
+    private ArenaManager arenaManager;
 
     public TNTRunSpigot() {
         instance = this;
@@ -29,7 +37,6 @@ public final class TNTRunSpigot extends JavaPlugin {
         System.out.println("TNTRun Plugin Enabled");
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, actionbarChannel);
-        Bukkit.getPluginManager().registerEvents(new PlayerMessageListener(), this);
 
         //We ensure the file exists in the plugin
         this.saveResource("hibernate.properties", false);
@@ -40,23 +47,28 @@ public final class TNTRunSpigot extends JavaPlugin {
                 //.configure()
                 .buildSessionFactory();
 
+
+
+        arenaManager = new ArenaManager();
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+            this.lobby = Objects.requireNonNull(Bukkit.getWorld("world")).getSpawnLocation();
+            arenaManager.LoadAllArenas();
+        }, 1);
+
+        EventListenerTemplate.registerEvents(this);
+
+
+
+
         var mainCommand = this.getCommand(CommandRoot.command);
 
         assert mainCommand != null;
 
-        var tabExecutor = new CommandRoot();
+        var tabExecutor = new CommandRoot(this);
 
         mainCommand.setExecutor(tabExecutor);
         mainCommand.setTabCompleter(tabExecutor);
-
-        var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
-        ArenaRepository repo = new ArenaRepository_(session);
-
-        repo.findAll().forEach(arenaEntity -> {
-            arenaEntity.LoadArena(repo);
-        });
-
-        session.close();
     }
 
     @Override
@@ -64,11 +76,7 @@ public final class TNTRunSpigot extends JavaPlugin {
 
         var session = TNTRunSpigot.instance.getSessionFactory().openStatelessSession();
 
-        ArenaRepository repo = new ArenaRepository_(session);
-
-        repo.findAll().forEach(ArenaEntity::UnloadArena);
-
-        session.close();
+        arenaManager.UnloadAllArenas();
 
         if (this.sessionFactory != null) {
             this.sessionFactory.close();

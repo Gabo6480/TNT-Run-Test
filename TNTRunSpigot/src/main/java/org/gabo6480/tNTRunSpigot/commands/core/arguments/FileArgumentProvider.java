@@ -39,7 +39,7 @@ public class FileArgumentProvider extends AbstractArgumentProvider<File>{
     }
 
     @Override
-    public Collection<? extends File> getObjectCollection(CommandContext context, int currentArgumentIndex) {
+    public Collection<? extends File> GetObjectCollection(CommandContext context, int currentArgumentIndex) {
 
         var files = worldContainer.listFiles(File::isDirectory);
 

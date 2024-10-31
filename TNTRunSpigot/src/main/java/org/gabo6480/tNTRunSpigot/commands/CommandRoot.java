@@ -3,6 +3,7 @@ package org.gabo6480.tNTRunSpigot.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.gabo6480.tNTRunSpigot.TNTRunSpigot;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandContext;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandTemplate;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandVisibility;
@@ -21,13 +22,15 @@ public class CommandRoot extends CommandTemplate implements TabExecutor {
 
     CommandTemplate cmdHelp;
 
-    public CommandRoot() {
+    public CommandRoot(TNTRunSpigot plugin) {
         //this.cmdHelp = cmdHelp;
 
         this.visibility = CommandVisibility.VISIBLE;
 
-        this.subCommands.add(new ArenaCommand());
+        this.subCommands.add(new ArenaCommand(plugin.getArenaManager()));
         this.subCommands.add(new WorldCommand());
+        this.subCommands.add(new LeaveCommand(plugin.getArenaManager()));
+        this.subCommands.add(new JoinCommand(plugin.getArenaManager()));
     }
 
     @Override
