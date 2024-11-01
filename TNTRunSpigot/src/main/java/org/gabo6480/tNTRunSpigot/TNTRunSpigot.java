@@ -3,14 +3,17 @@ package org.gabo6480.tNTRunSpigot;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.gabo6480.tNTRunSpigot.commands.CommandRoot;
 import org.gabo6480.tNTRunSpigot.entities.ArenaEntity;
 import org.gabo6480.tNTRunSpigot.listeners.EventListenerTemplate;
 import org.gabo6480.tNTRunSpigot.managers.ArenaManager;
+import org.gabo6480.tNTRunSpigot.util.TranslationUtil;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public final class TNTRunSpigot extends JavaPlugin {
@@ -37,6 +40,14 @@ public final class TNTRunSpigot extends JavaPlugin {
         System.out.println("TNTRun Plugin Enabled");
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, actionbarChannel);
+
+        try {
+            TranslationUtil.Initialize(this);
+        } catch (IOException | IllegalAccessException | InvalidConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+
+
 
         //We ensure the file exists in the plugin
         this.saveResource("hibernate.properties", false);

@@ -2,6 +2,7 @@ package org.gabo6480.tNTRunSpigot.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.experimental.ExtensionMethod;
 import org.bukkit.*;
 import org.bukkit.block.data.type.TNT;
 import org.bukkit.boss.BarColor;
@@ -18,6 +19,9 @@ import org.bukkit.scheduler.BukkitTask;
 import org.gabo6480.tNTRunSpigot.TNTRunSpigot;
 import org.gabo6480.tNTRunSpigot.entities.arena.ArenaPlayer;
 import org.gabo6480.tNTRunSpigot.entities.arena.ArenaState;
+import org.gabo6480.tNTRunSpigot.util.PacketUtil;
+import org.gabo6480.tNTRunSpigot.util.TranslationUtil;
+import org.gabo6480.tNTRunSpigot.util.extensions.StringExtension;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +30,7 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "arena")
+@ExtensionMethod(StringExtension.class)
 public class ArenaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -98,21 +103,21 @@ public class ArenaEntity {
                     bossBar.setProgress(1D);
                     bossBar.setColor(BarColor.BLUE);
                 }
-                bossBar.setTitle("Waiting for players " + activePlayers.size() + "/" + minPlayers);
+                bossBar.setTitle(TranslationUtil.Arena.BossBar.waiting_for_players.putPlaceholder("%aliveCount%", activePlayers.size()).putPlaceholder("%minPlayers%", minPlayers));
             }
             case GAME_STARTING -> {
-                bossBar.setTitle("Starting game!");
+                bossBar.setTitle(TranslationUtil.Arena.BossBar.starting_game);
                 bossBar.setProgress((double) secondsTillStart / 5D);
                 bossBar.setColor(BarColor.GREEN);
             }
             case IN_GAME -> {
-                bossBar.setTitle("RUN! " + activePlayers.size() + "/" + activePlayersAtStart + " remaining!");
+                bossBar.setTitle(TranslationUtil.Arena.BossBar.in_game.putPlaceholder("%aliveCount%", activePlayers.size()).putPlaceholder("%playerCount%", activePlayersAtStart));
                 bossBar.setProgress((double) activePlayers.size() / (double) activePlayersAtStart);
                 bossBar.setColor(BarColor.PURPLE);
             }
             case ENDING -> {
                 assert winner != null;
-                bossBar.setTitle(winner.getPlayer().getDisplayName() + " is the Winner!");
+                bossBar.setTitle(TranslationUtil.Arena.BossBar.player_won.putPlaceholder("%player%", winner.getPlayer().getDisplayName()));
                 bossBar.setColor(BarColor.YELLOW);
                 bossBar.setProgress(1D);
             }
@@ -219,7 +224,7 @@ public class ArenaEntity {
 
         activePlayers.put(player.getUniqueId(), new ArenaPlayer(player, this));
 
-        player.sendMessage("§3[§1" + name + "§3] Current players " + activePlayers.size() + "/" + minPlayers);
+        player.sendMessage(TranslationUtil.Arena.welcome_message.putPlaceholder("%arena%",name).putPlaceholder("%currentPlayers%", activePlayers.size()).putPlaceholder("%minPlayers%",minPlayers));
         bossBar.addPlayer(player);
 
         this.UpdateBossBar();
@@ -295,9 +300,11 @@ public class ArenaEntity {
         player.teleport(GetWaitingRoomLocation());
         player.setGameMode(GameMode.ADVENTURE);
         player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
-        player.sendTitle("§6YOU WON!", "CONGRATULATIONS!", 5, 35, 0);
+        player.sendTitle(TranslationUtil.Arena.you_won, TranslationUtil.Arena.congratulations, 5, 35, 0);
         player.setAllowFlight(true);
         player.setFlying(true);
+
+        this.BroadcastToPlayers(TranslationUtil.Arena.Player.won.putPlaceholder("%player%",winner.getPlayer().getDisplayName()));
 
         if(currentTask != null) currentTask.cancel();
         currentTask = Bukkit.getScheduler().runTaskTimer(TNTRunSpigot.instance, () -> {
@@ -361,7 +368,7 @@ public class ArenaEntity {
 
         activePlayers.values().forEach(arenaPlayer -> {
             var player = arenaPlayer.getPlayer();
-            player.sendTitle("§4RUN!", "", 5, 10, 5);
+            player.sendTitle(TranslationUtil.Arena.run, "", 5, 10, 5);
             player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
         });
 
@@ -440,7 +447,7 @@ public class ArenaEntity {
 
         //user.addGameItems("leave-item");
 
-        //arena.broadcastFormattedMessage("messages.in-game.fell-into-void", user);
+        this.BroadcastToPlayers(TranslationUtil.Arena.Player.lost.putPlaceholder("%player%", arenaPlayer.getPlayer().getDisplayName()));
 
         this.UpdateBossBar();
 
@@ -451,9 +458,10 @@ public class ArenaEntity {
         activePlayers.remove(arenaPlayer.GetUniqueId());
         deadPlayers.remove(arenaPlayer.GetUniqueId());
 
-        if(this.state == ArenaState.IN_GAME && !arenaPlayer.IsSpectator()) arenaPlayer.PlayerDeathEffect();
-
-        //arena.broadcastFormattedMessage("messages.in-game.fell-into-void", user);
+        if(this.state == ArenaState.IN_GAME && !arenaPlayer.IsSpectator()) {
+            arenaPlayer.PlayerDeathEffect();
+            this.BroadcastToPlayers(TranslationUtil.Arena.Player.left.putPlaceholder("%player%",arenaPlayer.getPlayer().getDisplayName()));
+        }
 
         var player = arenaPlayer.getPlayer();
 
@@ -468,5 +476,10 @@ public class ArenaEntity {
         this.UpdateBossBar();
 
         CheckForWinner();
+    }
+
+    private void BroadcastToPlayers(@NotNull String message){
+        this.activePlayers.values().forEach(arenaPlayer -> PacketUtil.SendPacketToPlayer(arenaPlayer.getPlayer(), message));
+        this.deadPlayers.values().forEach(arenaPlayer -> PacketUtil.SendPacketToPlayer(arenaPlayer.getPlayer(), message));
     }
 }

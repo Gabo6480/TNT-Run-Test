@@ -429,7 +429,7 @@ public class ArenaCommand extends CommandTemplate {
         context.getSender().sendMessage("§3Current arenas:");
         int index = 0;
         for(var arena : this.arenaManager.getArenas().values()){
-            context.getSender().sendMessage("§3  " + ++index + ".- " + arena.getName() + " - " + arena.getState().name() + " (" + arena.getActivePlayers().size() + "/" + arena.getMinPlayers() + ")" );
+            context.getSender().sendMessage("§3  " + ++index + ".- " + arena.getName() + " - " + arena.getState().getTranslation() + " (" + arena.getActivePlayers().size() + "/" + arena.getMinPlayers() + ")" );
         }
 
         return true;

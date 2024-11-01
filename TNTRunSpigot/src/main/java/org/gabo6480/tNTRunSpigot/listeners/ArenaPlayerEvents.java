@@ -23,21 +23,6 @@ public class ArenaPlayerEvents extends EventListenerTemplate{
     }
 
     @EventHandler
-    public void onPlayerMessage(AsyncPlayerChatEvent event){
-        Player player = event.getPlayer();
-
-        String message = event.getMessage() + " - " + new Random().nextInt();
-
-        System.out.println("Received message: "+message);
-
-        var buffer = new PluginMessageByteBuffer();
-
-        buffer.writeString(message);
-
-        player.sendPluginMessage(TNTRunSpigot.instance, TNTRunSpigot.actionbarChannel, buffer.asByteArray());
-    }
-
-    @EventHandler
     public void onEntityDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player victim)) return;
 

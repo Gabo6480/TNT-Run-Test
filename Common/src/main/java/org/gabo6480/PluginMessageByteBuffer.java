@@ -3,6 +3,7 @@ package org.gabo6480;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -230,6 +231,27 @@ public class PluginMessageByteBuffer {
     public void writeString(@NotNull String string) {
         this.ensureWriting();
         this.writeByteArray(string.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Write an Object.
+     *
+     * @param obj the Object to write
+     */
+    public <T> void writeObject(@NotNull T obj) {
+        this.ensureWriting();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        byte[] array;
+        try (ObjectOutputStream out = new ObjectOutputStream(bos)) {
+            out.writeObject(obj);
+            out.flush();
+            array =  bos.toByteArray();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+        this.writeByteArray(array);
     }
 
     /**
