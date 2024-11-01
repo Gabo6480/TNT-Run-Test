@@ -390,6 +390,16 @@ public class ArenaCommand extends CommandTemplate {
                 return true;
             }
 
+            if(!arena.IsArenaState(ArenaState.WAITING_FOR_PLAYERS)) {
+                context.getSender().sendMessage("§4You cannot force start \"" + nameAsString + "\"");
+                return true;
+            }
+
+            if(arena.getActivePlayers().isEmpty()) {
+                context.getSender().sendMessage("§4There are no players in \"" + nameAsString + "\"");
+                return true;
+            }
+
             context.getSender().sendMessage("§3Forcing game to start in \"" + nameAsString + "\"...");
             arena.BeginStartingGame();
 

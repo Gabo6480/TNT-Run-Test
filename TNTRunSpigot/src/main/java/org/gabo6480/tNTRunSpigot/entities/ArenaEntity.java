@@ -3,6 +3,7 @@ package org.gabo6480.tNTRunSpigot.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.bukkit.*;
+import org.bukkit.block.data.type.TNT;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -13,16 +14,14 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 import org.gabo6480.tNTRunSpigot.TNTRunSpigot;
 import org.gabo6480.tNTRunSpigot.entities.arena.ArenaPlayer;
 import org.gabo6480.tNTRunSpigot.entities.arena.ArenaState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 @Data
 @Entity
@@ -74,8 +73,9 @@ public class ArenaEntity {
     @NotNull
     @Transient
     private BossBar bossBar;
+    @Nullable
     @Transient
-    private int currentScheduleId;
+    private BukkitTask currentTask;
     @Transient
     private int restartScheduleId;
 
@@ -169,8 +169,7 @@ public class ArenaEntity {
 
         world.getPlayers().forEach(this::TeleportToLobby);
 
-        Bukkit.getScheduler().cancelTask(currentScheduleId);
-        currentScheduleId = -1;
+        if(currentTask != null) currentTask.cancel();
 
         this.state = ArenaState.UNLOADED;
         bossBar.removeAll();
@@ -184,7 +183,7 @@ public class ArenaEntity {
         restartScheduleId = -1;
         this.UnloadArena();
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(TNTRunSpigot.instance, this::LoadArena, 5 * 20);
+        if(TNTRunSpigot.instance.isEnabled()) Bukkit.getScheduler().scheduleSyncDelayedTask(TNTRunSpigot.instance, this::LoadArena, 5 * 20);
     }
 
     public boolean IsInArena(Player player){
@@ -271,11 +270,17 @@ public class ArenaEntity {
 
 
     public void CheckForWinner(){
-        if (activePlayers.size() != 1) return;
+        if (activePlayers.size() > 1) return;
 
         this.state = ArenaState.ENDING;
 
-        this.winner = activePlayers.values().iterator().next();
+        if(activePlayers.size() == 1)
+            this.winner = activePlayers.values().iterator().next();
+        else {
+            var list = deadPlayers.values().stream().toList();
+            if(list.isEmpty()) return;
+            this.winner = list.get(list.size() - 1);
+        }
 
         this.UpdateBossBar();
         //arena.broadcastFormattedMessage("messages.in-game.last-one-fell-into-void", user);
@@ -286,13 +291,16 @@ public class ArenaEntity {
 
         var player =  winner.getPlayer();
 
+        winner.setAlive(false);
         player.teleport(GetWaitingRoomLocation());
         player.setGameMode(GameMode.ADVENTURE);
+        player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
         player.sendTitle("§6YOU WON!", "CONGRATULATIONS!", 5, 35, 0);
         player.setAllowFlight(true);
         player.setFlying(true);
 
-        currentScheduleId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TNTRunSpigot.instance, () -> {
+        if(currentTask != null) currentTask.cancel();
+        currentTask = Bukkit.getScheduler().runTaskTimer(TNTRunSpigot.instance, () -> {
             if(!IsInArena(winner.getPlayer())) return;
 
             Location loc = winner.getPlayer().getLocation();
@@ -303,7 +311,7 @@ public class ArenaEntity {
             FireworkMeta fwm = fw.getFireworkMeta();
 
             fwm.setPower(2);
-            fw.setLife(5);
+            fw.setLife(2);
 
             var color = java.awt.Color.getHSBColor(new Random().nextFloat(0,1), 1f, 1f);
 
@@ -326,9 +334,10 @@ public class ArenaEntity {
             MovePlayerToStartingGame(arenaPlayer.getPlayer());
         });
 
-        currentScheduleId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TNTRunSpigot.instance, () -> {
+        if(currentTask != null) currentTask.cancel();
+        currentTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TNTRunSpigot.instance, () -> {
             if(secondsTillStart == 0){
-                StartGame();
+                Bukkit.getScheduler().scheduleSyncDelayedTask(TNTRunSpigot.instance, this::StartGame, 1);
                 return;
             }
 
@@ -343,7 +352,7 @@ public class ArenaEntity {
     }
 
     private void StartGame(){
-        Bukkit.getScheduler().cancelTask(currentScheduleId);
+        if(currentTask != null) currentTask.cancel();
 
         state = ArenaState.IN_GAME;
         activePlayersAtStart = activePlayers.size();
@@ -356,7 +365,41 @@ public class ArenaEntity {
             player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
         });
 
-        CheckForWinner();
+
+
+        if(currentTask != null) currentTask.cancel();
+        currentTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TNTRunSpigot.instance, () -> {
+            if (state != ArenaState.IN_GAME) {
+                if(currentTask != null) currentTask.cancel();
+                return;
+            }
+            activePlayers.values().forEach(arenaPlayer -> {
+                var player = arenaPlayer.getPlayer();
+                var bb = player.getBoundingBox().clone();
+
+                var Y = bb.getMinY() - 1.2;
+                var world = player.getWorld();
+                var blocks = List.of(
+                        world.getBlockAt(new Location(world, bb.getMinX(), Y, bb.getMinZ())),
+                        world.getBlockAt(new Location(world, bb.getMinX(), Y, bb.getMaxZ())),
+                        world.getBlockAt(new Location(world, bb.getMaxX(), Y, bb.getMinZ())),
+                        world.getBlockAt(new Location(world, bb.getMaxX(), Y, bb.getMaxZ()))
+                );
+
+                if(TNTRunSpigot.instance.isEnabled() && blocks.stream().anyMatch(b -> b.getType().equals(Material.TNT))){
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(TNTRunSpigot.instance, () -> {
+                        for(var block : blocks){
+                            if(!block.getType().equals(Material.TNT)) continue;
+                            block.setType(Material.AIR);
+                            block.getWorld().playSound(block.getLocation(), Sound.ENTITY_TNT_PRIMED, 1, 1);
+                        }
+
+                    }, 4);
+                }
+            });
+        }, 5, 1);
+
+        //CheckForWinner();
     }
 
 
