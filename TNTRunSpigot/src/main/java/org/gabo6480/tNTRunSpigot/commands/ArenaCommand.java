@@ -1,10 +1,9 @@
 package org.gabo6480.tNTRunSpigot.commands;
 
 import org.bukkit.Location;
-import org.gabo6480.tNTRunSpigot.TNTRunSpigot;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandContext;
-import org.gabo6480.tNTRunSpigot.commands.core.CommandRequirements;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandTemplate;
+import org.gabo6480.tNTRunSpigot.commands.core.annotations.PlayerOnly;
 import org.gabo6480.tNTRunSpigot.commands.core.arguments.*;
 import org.gabo6480.tNTRunSpigot.entities.arena.ArenaState;
 import org.gabo6480.tNTRunSpigot.managers.ArenaManager;
@@ -59,6 +58,7 @@ public class ArenaCommand extends CommandTemplate {
         }
     }
 
+    @PlayerOnly
     public static class ArenaTeleportSubCommand extends CommandTemplate{
         final ArenaManager arenaManager;
 
@@ -69,8 +69,6 @@ public class ArenaCommand extends CommandTemplate {
             this.requiredArgs.add(new ArenaArgumentProvider());
             this.requiredArgs.add(new ListStringArgumentProvider("place", "waitingroom", "startpoint", "waitingroom"));
             this.optionalArgs.add(new BooleanArgumentProvider("force load", false));
-
-            this.requirements = CommandRequirements.builder().playerOnly(true).build();
         }
 
         @Override
@@ -126,6 +124,7 @@ public class ArenaCommand extends CommandTemplate {
         }
     }
 
+    @PlayerOnly
     public static class ArenaSetWaitingRoomSubCommand extends CommandTemplate{
         final ArenaManager arenaManager;
 
@@ -134,8 +133,6 @@ public class ArenaCommand extends CommandTemplate {
             this.aliases.add( "setwaitingroom" );
 
             this.requiredArgs.add(new ArenaArgumentProvider());
-
-            this.requirements = CommandRequirements.builder().playerOnly(true).build();
         }
 
         @Override
@@ -179,6 +176,7 @@ public class ArenaCommand extends CommandTemplate {
         }
     }
 
+    @PlayerOnly
     public static class ArenaSetStartPointSubCommand extends CommandTemplate{
         final ArenaManager arenaManager;
 
@@ -187,8 +185,6 @@ public class ArenaCommand extends CommandTemplate {
             this.aliases.add( "setstartpoint" );
 
             this.requiredArgs.add(new ArenaArgumentProvider());
-
-            this.requirements = CommandRequirements.builder().playerOnly(true).build();
         }
 
         @Override

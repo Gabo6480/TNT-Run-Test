@@ -1,14 +1,12 @@
 package org.gabo6480.tNTRunSpigot.commands;
 
-import org.bukkit.Bukkit;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandContext;
-import org.gabo6480.tNTRunSpigot.commands.core.CommandRequirements;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandTemplate;
+import org.gabo6480.tNTRunSpigot.commands.core.annotations.PlayerOnly;
 import org.gabo6480.tNTRunSpigot.commands.core.arguments.ArenaArgumentProvider;
-import org.gabo6480.tNTRunSpigot.commands.core.arguments.WorldArgumentProvider;
-import org.gabo6480.tNTRunSpigot.entities.arena.ArenaState;
 import org.gabo6480.tNTRunSpigot.managers.ArenaManager;
 
+@PlayerOnly
 public class JoinCommand extends CommandTemplate {
 
     final ArenaManager arenaManager;
@@ -20,8 +18,6 @@ public class JoinCommand extends CommandTemplate {
         this.aliases.add( "join" );
 
         this.requiredArgs.add(new ArenaArgumentProvider((arena, context) -> context.getPlayer() != null && arena.CanPlayerJoin(context.getPlayer())));
-
-        this.requirements = CommandRequirements.builder().playerOnly(true).build();
     }
 
     @Override

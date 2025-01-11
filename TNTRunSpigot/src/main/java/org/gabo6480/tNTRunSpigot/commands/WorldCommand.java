@@ -2,18 +2,17 @@ package org.gabo6480.tNTRunSpigot.commands;
 
 import org.bukkit.Bukkit;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandContext;
-import org.gabo6480.tNTRunSpigot.commands.core.CommandRequirements;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandTemplate;
+import org.gabo6480.tNTRunSpigot.commands.core.annotations.PlayerOnly;
 import org.gabo6480.tNTRunSpigot.commands.core.arguments.WorldArgumentProvider;
 
+@PlayerOnly
 public class WorldCommand extends CommandTemplate {
     public static class WorldTeleportSubCommand extends CommandTemplate{
         public WorldTeleportSubCommand() {
             this.aliases.add( "teleport" );
 
             this.requiredArgs.add(new WorldArgumentProvider());
-
-            this.requirements = CommandRequirements.builder().playerOnly(true).build();
         }
 
         @Override

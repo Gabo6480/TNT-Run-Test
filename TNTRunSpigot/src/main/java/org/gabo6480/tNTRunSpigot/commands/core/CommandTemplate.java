@@ -2,6 +2,7 @@ package org.gabo6480.tNTRunSpigot.commands.core;
 
 import lombok.Getter;
 import org.bukkit.ChatColor;
+import org.gabo6480.tNTRunSpigot.commands.core.annotations.PlayerOnly;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -17,8 +18,6 @@ public abstract class CommandTemplate {
     protected LinkedList<ArgumentProvider> requiredArgs;
     protected LinkedList<OptionalArgumentProvider> optionalArgs;
 
-    // Requirements to execute this command
-    protected CommandRequirements requirements;
     /*
         Subcommands
      */
@@ -35,8 +34,6 @@ public abstract class CommandTemplate {
 
         requiredArgs = new LinkedList<>();
         optionalArgs = new LinkedList<>();
-
-        requirements = CommandRequirements.builder().build();
 
         subCommands = new ArrayList<>();
 
@@ -139,7 +136,18 @@ public abstract class CommandTemplate {
     ///
 
     private boolean IsValidCall(CommandContext context) {
-        return requirements.ComputeRequirements(context) && AreArgsValid(context);
+        return ComputeRequirements(context) && AreArgsValid(context);
+    }
+
+    private boolean ComputeRequirements(CommandContext context) {
+
+        if (context.player == null && this.getClass().getAnnotation(PlayerOnly.class) != null){
+            return false;
+        }
+
+        //TODO: ADD PERMISSION
+
+        return true;
     }
 
     private boolean AreArgsValid(CommandContext context){
@@ -159,7 +167,7 @@ public abstract class CommandTemplate {
     }
 
     private boolean IsVisible(CommandContext context) {
-        return this.visibility != CommandVisibility.INVISIBLE && requirements.ComputeRequirements(context);
+        return this.visibility != CommandVisibility.INVISIBLE && ComputeRequirements(context);
     }
 
 }

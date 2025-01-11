@@ -1,5 +1,6 @@
 package org.gabo6480.tNTRunSpigot.commands;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;

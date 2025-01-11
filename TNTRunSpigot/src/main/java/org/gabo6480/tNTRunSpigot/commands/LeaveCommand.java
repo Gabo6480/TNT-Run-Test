@@ -1,12 +1,11 @@
 package org.gabo6480.tNTRunSpigot.commands;
 
 import org.gabo6480.tNTRunSpigot.commands.core.CommandContext;
-import org.gabo6480.tNTRunSpigot.commands.core.CommandRequirements;
 import org.gabo6480.tNTRunSpigot.commands.core.CommandTemplate;
-import org.gabo6480.tNTRunSpigot.commands.core.arguments.ArenaArgumentProvider;
-import org.gabo6480.tNTRunSpigot.entities.arena.ArenaState;
+import org.gabo6480.tNTRunSpigot.commands.core.annotations.PlayerOnly;
 import org.gabo6480.tNTRunSpigot.managers.ArenaManager;
 
+@PlayerOnly
 public class LeaveCommand extends CommandTemplate {
     final ArenaManager arenaManager;
 
@@ -16,8 +15,6 @@ public class LeaveCommand extends CommandTemplate {
         this.arenaManager = arenaManager;
 
         this.aliases.add( "leave" );
-
-        this.requirements = CommandRequirements.builder().playerOnly(true).build();
     }
 
     @Override

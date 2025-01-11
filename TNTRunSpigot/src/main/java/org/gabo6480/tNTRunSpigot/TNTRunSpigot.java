@@ -1,9 +1,14 @@
 package org.gabo6480.tNTRunSpigot;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import lombok.Getter;
+import net.minecraft.commands.CommandDispatcher;
+import net.minecraft.commands.CommandListenerWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.gabo6480.tNTRunSpigot.commands.CommandRoot;
 import org.gabo6480.tNTRunSpigot.entities.ArenaEntity;
@@ -15,6 +20,12 @@ import org.hibernate.cfg.Configuration;
 
 import java.io.IOException;
 import java.util.Objects;
+
+import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
+import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
+import static com.mojang.brigadier.builder.LiteralArgumentBuilder.literal;
+import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
+
 
 public final class TNTRunSpigot extends JavaPlugin {
 
@@ -69,7 +80,7 @@ public final class TNTRunSpigot extends JavaPlugin {
 
         EventListenerTemplate.registerEvents(this);
 
-
+        Bukkit.getPluginManager().addPermission(new Permission("A"));
 
 
         var mainCommand = this.getCommand(CommandRoot.command);
@@ -80,6 +91,21 @@ public final class TNTRunSpigot extends JavaPlugin {
 
         mainCommand.setExecutor(tabExecutor);
         mainCommand.setTabCompleter(tabExecutor);
+
+        var dispatcher = ((CraftServer) Bukkit.getServer()).getServer().vanillaCommandDispatcher;
+
+        dispatcher.a().register((LiteralArgumentBuilder<CommandListenerWrapper>) ((LiteralArgumentBuilder) CommandDispatcher.a("foo"))
+                        .then(
+                                argument("bar", integer())
+                                        .executes(c -> {
+                                            System.out.println("Bar is " + getInteger(c, "bar"));
+                                            return 1;
+                                        })
+                        )
+                        .executes(c -> {
+                            System.out.println("Called foo with no arguments");
+                            return 1;
+                        }));
     }
 
     @Override
